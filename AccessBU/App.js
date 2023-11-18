@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
+const GOOGLE_MAPS_APIKEY = 'insert Key'; // Replace with your Google Maps API key
 
 function HomeScreen() {
   const [location, setLocation] = useState(null);
