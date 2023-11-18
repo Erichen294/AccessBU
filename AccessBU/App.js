@@ -5,7 +5,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { StatusBar } from 'expo-status-bar';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
 
 function HomeScreen() {
   const [location, setLocation] = useState(null);
@@ -27,6 +29,7 @@ function HomeScreen() {
     <View style={styles.container}>
       {location && (
         <MapView
+          provider={PROVIDER_GOOGLE}
           style={styles.map}
           initialRegion={{
             latitude: location.coords.latitude,
@@ -34,6 +37,7 @@ function HomeScreen() {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
+          customMapStyle={GOOGLE_MAPS_APIKEY}
         >
           <Marker
             coordinate={{
@@ -48,6 +52,7 @@ function HomeScreen() {
     </View>
   );
 }
+
 
 function AboutScreen() {
   return (
