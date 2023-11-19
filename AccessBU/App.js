@@ -9,10 +9,15 @@ import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import polyline from '@mapbox/polyline';
 import RenderHTML from 'react-native-render-html';
+import * as Tts from 'expo-speech';
+import * as Speech from 'expo-speech';
 
 
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
 
-const GOOGLE_MAPS_APIKEY = 'chillout'; // Replace with your Google Maps API key
+function removeHTMLTags(str) {
+  return str.replace(/<[^>]*>?/gm, '');
+}
 
 function HomeScreen() {
   const [location, setLocation] = useState(null);
@@ -24,6 +29,7 @@ function HomeScreen() {
 
 
   useEffect(() => {
+    
     let locationSubscription;
 
     (async () => {
@@ -121,17 +127,20 @@ function HomeScreen() {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       // Update the current instruction
-      setCurrentInstruction(steps[currentStep + 1].html_instructions);
-      console.log(`Displaying Step ${currentStep + 2}: ${steps[currentStep + 1].html_instructions}`);
+      const newInstruction = steps[currentStep + 1].html_instructions;
+      const newInstructionTAGLESS = removeHTMLTags(steps[currentStep + 1].html_instructions);
+      setCurrentInstruction(newInstruction);
+      Speech.speak(newInstructionTAGLESS); // Read the instruction aloud
+      console.log(`Displaying Step ${currentStep + 1}: ${newInstruction}`);
     } else {
       setCurrentStep(0);
       // Reset the current instruction
       setCurrentInstruction('');
+      Speech.stop(); // Stop speaking
       setShowStartNavigation(false);
       console.log('Navigation completed.'); // Indicate when navigation finishes
     }
   };
-
 
 
   return (
