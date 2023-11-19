@@ -7,8 +7,10 @@ import * as Location from 'expo-location';
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import polyline from '@mapbox/polyline';
 
-const GOOGLE_MAPS_APIKEY = 'insert Key'; // Replace with your Google Maps API key
+
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
 
 function HomeScreen() {
   const [location, setLocation] = useState(null);
@@ -44,61 +46,90 @@ function HomeScreen() {
     };
   }, []);
 
-  const getDirections = async () => {
+  const getDirections = async (destination) => {
     try {
+      console.log(`Origin: ${location.coords.latitude},${location.coords.longitude}`);
+      console.log(`Destination: ${destination}`);
+  
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${location.coords.latitude},${location.coords.longitude}&destination=${destination}&mode=walking&key=${GOOGLE_MAPS_APIKEY}`
       );
       const data = await response.json();
-      const points = data.routes[0].overview_polyline.points;
-      setDirections(points);
+  
+      if (!data.routes.length) {
+        console.log('No routes found');
+        return;
+      }
+  
+      const points = polyline.decode(data.routes[0].overview_polyline.points);
+      const coords = points.map(point => {
+        return  {
+          latitude : point[0],
+          longitude : point[1]
+        }
+      })
+      setDirections(coords);
     } catch (error) {
       console.error(error);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.directions}>
-        <GooglePlacesAutocomplete
-          placeholder='Enter Destination'
-          onPress={(data, details = null) => {
-            setDestination(details.formatted_address);
-          }}
-          query={{
-            key: GOOGLE_MAPS_APIKEY,
-            language: 'en',
-          }}
-        />
-        <Button title="Get Directions" onPress={getDirections} />
-      </View>
-      {location && (
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          region={{
+
+return (
+  <View style={styles.container}>
+    <View style={styles.directions}>
+      <GooglePlacesAutocomplete
+        placeholder='Enter Destination'
+        onPress={(data, details = null) => {
+          if (details) {
+            console.log(details);
+            setDestination(details.description);
+          }
+        }}
+        query={{
+          key: GOOGLE_MAPS_APIKEY,
+          language: 'en',
+        }}
+      />
+      <Button title="Get Directions" onPress={() => getDirections(destination)} />
+    </View>
+    {location && (
+      <MapView
+        provider={PROVIDER_GOOGLE}
+        style={styles.map}
+        region={{
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        <Marker
+          coordinate={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
           }}
-        >
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title="My Location"
-          />
-          {directions && <Polyline coordinates={directions} />}
-        </MapView>
-      )}
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-// ... rest of your code
+          title="My Location"
+        />
+        {directions && (
+          <>
+            <Polyline
+              coordinates={directions}
+              strokeWidth={2}
+              strokeColor="red"
+            />
+            <Marker
+              coordinate={directions[directions.length - 1]} // New Marker for destination
+              title="Destination"
+            />
+          </>
+        )}
+      </MapView>
+    )}
+    <StatusBar style="auto" />
+  </View>
+);
+        }
 
 
 function AboutScreen() {
