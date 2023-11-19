@@ -1,19 +1,48 @@
 const https = require('https');
 const cors = require('cors');
 const apiKey = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y';
-const testOrigin = '700 Commonwealth Ave, Boston, MA 02215'
+const testOrigin = '8 St Marys St, Boston, MA 02215'
 const testDestination = '915 Commonwealth Ave, Boston, MA 02215'
 let OriginCoord; // Variable to store the coordinates
 let DestinationCoord; // Variable to store the coordinates
 
 const express = require('express');
 const app = express();
+const parsedData = {};
+
+// Add waypoints as latitude and longitude coordinates
+const stoplights = [
+    { lat: 42.349240808938475, lng: -71.10664866397359 },
+    { lat: 42.35135562, lng: -71.11583394 },
+    { lat: 42.35094121, lng: -71.11591662 },
+    { lat: 42.35092989, lng: -71.11573458 },
+    { lat: 42.35131338, lng: -71.115641 },
+    { lat: 42.35020661, lng: -71.10664062 },
+    { lat: 42.34985392, lng: -71.10676672 },
+    { lat: 42.34981235, lng: -71.10647767 },
+    { lat: 42.35018941, lng: -71.10644469 },
+    { lat:42.351450, lng:-71.116903}  
+];
+
+const adjacencyMatrix = [
+    [ 0, 160, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [160, 0, 46.57849493285967, 0, 15.012302892518925, 0, 0, 0, 0, 0],
+    [0,46.57849493285967, 0, 15.012302892518925, 0, 0, 0, 0, 0, 0],
+    [0, 0, 15.012302892518925, 0, 43.33000668116041, 0, 0, 0, 0, 0],
+    [0, 15.012302892518925, 0, 43.33000668116041, 0, 749.792054244618, 0, 0, 0, 0],
+    [0, 0, 0, 0, 749.792054244618, 0, 40.56332930166704, 0, 24.199152190916113, 0],
+    [0, 0, 0, 749.792054244618, 0, 40.56332930166704, 0, 24.199152190916113, 0, 0],
+    [0, 0, 0, 0, 0, 0, 24.199152190916113, 0, 42.014664034736946, 83],
+    [0, 0, 0, 0, 0, 24.199152190916113, 0, 42.014664034736946, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 83, 0, 0]
+];
 
 // Define an API endpoint for test communication
 app.get('/testCommunication', (req, res) => {
     // Respond with a simple string
-    res.send('Hello from the backend!');
+    res.send(parsedData.routes[0].overview_polyline.points);
 });
+
 // Start the server
 app.listen(2000, () => {
     console.log('Server is running on port 3000');
@@ -47,41 +76,87 @@ const AccessibleEntrances = [
     { lat: 42.351165, lng: -71.114665 }
 ];
 
+function dijkstra(adjMatrix, startNode, endNode) {
+    const numNodes = adjMatrix.length;
+    const distances = new Array(numNodes).fill(Infinity);
+    const visited = new Array(numNodes).fill(false);
+    const previous = new Array(numNodes).fill(null);
 
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    function toRad(x) {
-        return x * Math.PI / 180;
+    distances[startNode] = 0;
+
+    for (let i = 0; i < numNodes; i++) {
+        // Find the unvisited node with the smallest distance
+        let closestNode = -1;
+        for (let j = 0; j < numNodes; j++) {
+            if (!visited[j] && (closestNode === -1 || distances[j] < distances[closestNode])) {
+                closestNode = j;
+            }
+        }
+
+        visited[closestNode] = true;
+        if (closestNode === endNode) {
+            break; // We've reached the destination node
+        }
+
+        // Update distances for the neighbors of the closest node
+        for (let j = 0; j < numNodes; j++) {
+            if (adjMatrix[closestNode][j] !== 0) {
+                const newDistance = distances[closestNode] + adjMatrix[closestNode][j];
+                if (newDistance < distances[j]) {
+                    distances[j] = newDistance;
+                    previous[j] = closestNode;
+                }
+            }
+        }
     }
 
-    const R = 6371; // Radius of the earth in km
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a = 
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+    // Reconstruct the shortest path
+    const path = [];
+    for (let at = endNode; at !== null; at = previous[at]) {
+        path.unshift(at); // Prepend node to the path
+    }
+
+    return { distance: distances[endNode], path };
 }
 
-// function determineClosestDestination(destinationCoord, callback) {
-//     const [destLat, destLng] = destinationCoord.split(',').map(Number);
-//     const point1 = { lat: 42.35171, lng: -71.117284 };
-//     const point2 = { lat: 42.352122, lng: -71.116491 };
+// Example Usage
+const startNode = 0; // Node 0
+const endNode = 9;   // Node 7 (equivalent to old Node 8 in 1-based indexing)
+const result = dijkstra(adjacencyMatrix, startNode, endNode);
+console.log(`Shortest path from node ${startNode} to node ${endNode}:`, result.path);
+console.log(`Total distance: ${result.distance}`);
 
-//     const distanceToPoint1 = calculateDistance(destLat, destLng, point1.lat, point1.lng);
-//     const distanceToPoint2 = calculateDistance(destLat, destLng, point2.lat, point2.lng);
 
-//     console.log("this is distance")
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    function toRadians(degree) {
+        return degree * Math.PI / 180;
+    }
 
-//     if ((distanceToPoint1 < distanceToPoint2)) {
-//         console.log('Destination is closer to Point 1');
-//         callback(null, `${point1.lat},${point1.lng}`);
-//     } else {
-//         console.log('Destination is closer to Point 2');
-//         callback(null, `${point2.lat},${point2.lng}`);
-//     }
-// }
+    const earthRadiusMeters = 6371000; // Earth's radius in meters
+    const dLat = toRadians(lat2 - lat1);
+    const dLng = toRadians(lng2 - lng1);
+
+    lat1 = toRadians(lat1);
+    lat2 = toRadians(lat2);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.sin(dLng / 2) * Math.sin(dLng / 2) * Math.cos(lat1) * Math.cos(lat2); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+    return earthRadiusMeters * c; // Distance in meters
+}
+
+// const adjacencyMatrix = Array.from({ length: stoplights.length }, () => new Array(stoplights.length).fill(0));
+
+for (let i = 0; i < stoplights.length - 1; i++) {
+    const weight = calculateDistance(
+        stoplights[i].lat, stoplights[i].lng,
+        stoplights[i + 1].lat, stoplights[i + 1].lng
+    );
+    adjacencyMatrix[i][i + 1] = weight;    // Weighted edge from stoplight i to i+1
+    adjacencyMatrix[i + 1][i] = weight;    // Weighted edge from stoplight i+1 to i (undirected)
+}
+
+console.log(adjacencyMatrix);
 
 function determineClosestDestination(destinationCoord, AccessibleEntrances, callback) {
     const [destLat, destLng] = destinationCoord.split(',').map(Number);
@@ -143,24 +218,24 @@ function getDirections(originCoords, destinationCoords, apiKey) {
     const destination = destinationCoords;
 
     // Add waypoints as latitude and longitude coordinates
-    // const stoplights = [
-    //     { lat: 42.35135562, lng: -71.11583394 },
-    //     { lat: 42.35094121, lng: -71.11591662 },
-    //     { lat: 42.35092989, lng: -71.11573458 },
-    //     { lat: 42.35131338, lng: -71.115641 },
-    //     { lat: 42.35020661, lng: -71.10664062 },
-    //     { lat: 42.34985392, lng: -71.10676672 },
-    //     { lat: 42.34981235, lng: -71.10647767 },
-    //     { lat: 42.35018941, lng: -71.10644469 }
-    // ];
+    const stoplights = [
+        { lat: 42.35135562, lng: -71.11583394 },
+        // { lat: 42.35094121, lng: -71.11591662 },
+        // { lat: 42.35092989, lng: -71.11573458 },
+        { lat: 42.35131338, lng: -71.115641 },
+        { lat: 42.35020661, lng: -71.10664062 },
+        { lat: 42.34985392, lng: -71.10676672 },
+        { lat: 42.34981235, lng: -71.10647767 }
+        // { lat: 42.35018941, lng: -71.10644469 }
+    ];
     
-    // const waypoints = stoplights.map(s => `${s.lat},${s.lng}`).join('|');
+    const waypoints = "42.35135562, -71.11583394 | 42.35131338, -71.115641 | 42.35020661, -71.10664062 | 42.34985392, -71.10676672 | 42.34981235, -71.10647767"
 
-    const waypoints = [
-        // '42.346676,-71.097218', // Example coordinates
-        // '42.349046,-71.095313'  // More coordinates
-        ''
-    ].join('|');
+    // const waypoints = [
+    //     // '42.346676,-71.097218', // Example coordinates
+    //     // '42.349046,-71.095313'  // More coordinates
+    //     ''
+    // ].join('|');
 
     const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&waypoints=${waypoints}&mode=walking&key=${apiKey}`;
 
@@ -172,7 +247,7 @@ function getDirections(originCoords, destinationCoords, apiKey) {
         });
 
         res.on('end', () => {
-            const parsedData = JSON.parse(data);
+            parsedData = JSON.parse(data);
 
             if (parsedData.routes.length > 0 && parsedData.routes[0].legs.length > 0) {
                 const leg = parsedData.routes[0].legs[0];
