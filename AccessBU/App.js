@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import polyline from '@mapbox/polyline';
+import RenderHTML from 'react-native-render-html';
 
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
@@ -17,6 +18,8 @@ function HomeScreen() {
   const [destination, setDestination] = useState(null);
   const [directions, setDirections] = useState(null);
   const [showStartNavigation, setShowStartNavigation] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0); // To keep track of current step
+  const [steps, setSteps] = useState([]); // To store all the steps
 
 
   useEffect(() => {
@@ -35,6 +38,7 @@ function HomeScreen() {
           timeInterval: 1000,
         },
         (newLocation) => {
+          console.log('New location obtained:', newLocation);
           setLocation(newLocation);
         },
       );
@@ -61,14 +65,15 @@ function HomeScreen() {
         console.log('No routes found');
         return;
       }
-  
+
+      const newSteps = data.routes[0].legs[0].steps; // Extracting all steps
+      setSteps(newSteps); // Storing all the steps
+
       const points = polyline.decode(data.routes[0].overview_polyline.points);
-      const coords = points.map(point => {
-        return  {
-          latitude : point[0],
-          longitude : point[1]
-        }
-      })
+      const coords = points.map((point) => ({
+        latitude: point[0],
+        longitude: point[1],
+      }));
       setDirections(coords);
       setShowStartNavigation(true);
     } catch (error) {
@@ -76,74 +81,96 @@ function HomeScreen() {
     }
   };
 
+  const [currentInstruction, setCurrentInstruction] = useState('');
 
-return (
-  <View style={styles.container}>
-    <View style={styles.directions}>
-      <GooglePlacesAutocomplete
-        placeholder='Enter Destination'
-        onPress={(data, details = null) => {
-          if (details) {
-            console.log(details);
-            setDestination(details.description);
-          }
-        }}
-        query={{
-          key: GOOGLE_MAPS_APIKEY,
-          language: 'en',
-        }}
-      />
-      <Button title="Get Directions" onPress={() => getDirections(destination)} />
-    </View>
-    {location && (
-      <MapView
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        region={{
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-      >
-        <Marker
-          coordinate={{
+  const handleStartNavigation = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+      // Update the current instruction
+      setCurrentInstruction(steps[currentStep + 1].html_instructions);
+      console.log(`Displaying Step ${currentStep + 2}: ${steps[currentStep + 1].html_instructions}`);
+    } else {
+      setCurrentStep(0);
+      // Reset the current instruction
+      setCurrentInstruction('');
+      setShowStartNavigation(false);
+      console.log('Navigation completed.'); // Indicate when navigation finishes
+    }
+  };
+
+
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.directions}>
+        <GooglePlacesAutocomplete
+          placeholder='Enter Destination'
+          onPress={(data, details = null) => {
+            if (details) {
+              console.log(details);
+              setDestination(details.description);
+            }
+          }}
+          query={{
+            key: GOOGLE_MAPS_APIKEY,
+            language: 'en',
+          }}
+        />
+        <Button title="Get Directions" onPress={() => getDirections(destination)} />
+      </View>
+      {location && (
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          region={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
           }}
-          title="My Location"
-        />
-        {directions && (
-          <>
-            <Polyline
-              coordinates={directions}
-              strokeWidth={2}
-              strokeColor="red"
-            />
-            <Marker
-              coordinate={directions[directions.length - 1]} // New Marker for destination
-              title="Destination"
-            />
-          </>
-        )}
-      </MapView>
+        >
+          <Marker
+            coordinate={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }}
+            title="My Location"
+          />
+          {directions && (
+            <>
+              <Polyline
+                coordinates={directions}
+                strokeWidth={2}
+                strokeColor="red"
+              />
+              <Marker
+                coordinate={directions[directions.length - 1]} // New Marker for destination
+                title="Destination"
+              />
+              {showStartNavigation}
+            </>
+          )}
+        </MapView>
       )}
       {showStartNavigation && (
-        <View style={styles.navigationButtonContainer}>
-          <Pressable
-            style={styles.navigationButton}
-            onPress={() => {
-              // Action to start navigation can be added here
-            }}
-          >
-            <Text style={styles.navigationButtonText}>Start Navigation</Text>
-          </Pressable>
-        </View>
-      )}
+  <View style={styles.navigationButtonContainer}>
+    <Pressable
+  style={styles.navigationButton}
+  onPress={handleStartNavigation}
+>
+  <Text style={styles.navigationButtonText}>
+    {showStartNavigation ? 'Next Step' : 'Start Navigation'}
+  </Text>
+</Pressable>
+
+    <View style={styles.instructionsContainer}>
+      <RenderHTML contentWidth={100} source={{ html: currentInstruction }} />
+    </View>
+  </View>
+)}
       <StatusBar style="auto" />
     </View>
-  );
-}
+  );}
 
 
 function AboutScreen() {
@@ -220,6 +247,17 @@ const styles = StyleSheet.create({
   navigationButtonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 16,
+  },
+  instructionsContainer: {
+    position: 'absolute',
+    bottom: 70,
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 8,
+  },
+  instructionsText: {
     fontSize: 16,
   },
 });
