@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Pressable } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +16,7 @@ function HomeScreen() {
   const [location, setLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [directions, setDirections] = useState(null);
+  const [showStartNavigation, setShowStartNavigation] = useState(false);
 
 
   useEffect(() => {
@@ -69,6 +70,7 @@ function HomeScreen() {
         }
       })
       setDirections(coords);
+      setShowStartNavigation(true);
     } catch (error) {
       console.error(error);
     }
@@ -125,11 +127,23 @@ return (
           </>
         )}
       </MapView>
-    )}
-    <StatusBar style="auto" />
-  </View>
-);
-        }
+      )}
+      {showStartNavigation && (
+        <View style={styles.navigationButtonContainer}>
+          <Pressable
+            style={styles.navigationButton}
+            onPress={() => {
+              // Action to start navigation can be added here
+            }}
+          >
+            <Text style={styles.navigationButtonText}>Start Navigation</Text>
+          </Pressable>
+        </View>
+      )}
+      <StatusBar style="auto" />
+    </View>
+  );
+}
 
 
 function AboutScreen() {
@@ -191,5 +205,21 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  navigationButtonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+  },
+  navigationButton: {
+    backgroundColor: 'tomato',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  navigationButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
