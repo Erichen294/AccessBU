@@ -12,30 +12,59 @@ Welcome to **AccessBU** – your innovative guide through Boston University's ca
 
 ## 🛠️ Technologies Used
 - Google API
-- (List other technologies here)
+- MongoDB
+- React Native
 
 ## 📲 Installation and Setup
-(Describe the magical steps to get started with AccessBU.)
+To get started with AccessBU, follow these magical steps:
+
+1. Clone the repository:
+git clone https://github.com/Erichen294/AccessBU.git
+3. Install the dependencies:
+npm install
+5. Start the application:
+npm start
 
 ## 🎮 How to Use
-(Let's guide our users through the exciting journey of using AccessBU.)
+Using AccessBU is as easy as a walk in the park! Here's how you can navigate through our app:
 
-## 💡 Contributing
-Want to be a hero? 🦸 Contribute to AccessBU and make the BU campus a better place for everyone! Here's how you can join our league of extraordinary contributors:
-1. **Fork the Repository**: Get your own version up and running.
-2. **Be a Feature Wizard**: Create a branch for your amazing feature (`git checkout -b feature/MagicFeature`).
-3. **Commit Your Spells**: Make your changes come to life (`git commit -am 'Abracadabra'`).
-4. **Push to the Mystical Land**: Send your changes to us (`git push origin feature/MagicFeature`).
-5. **Create a Pull Request**: Let us see the magic you've conjured!
+1. **Open AccessBU**: Launch the app on your device.
+
+2. **Set Your Destination**: 
+   - Enter the destination you want to reach on the BU campus.
+   - You can search for specific buildings, departments, or landmarks.
+
+3. **Choose Your Preferences**:
+   - Select any specific accessibility needs you have, like wheelchair-friendly routes or audible signals at crosswalks.
+
+4. **Start Navigation**:
+   - The app will calculate the most accessible route based on your preferences.
+   - A map with your route clearly marked will be displayed.
+
+5. **Follow the Directions**:
+   - For visual guidance, follow the highlighted route on the map.
+   - For audible directions, listen to the voice instructions guiding you through each turn and stop.
+
+6. **Contribute to the Community**:
+   - Found an accessible entrance or an audible stoplight not yet in our database? Add it through the app!
+   - Your contributions help make BU more accessible for everyone.
+
+7. **Feedback and Support**:
+   - Encounter any issues or have suggestions? Use the feedback feature in the app to let us know.
+
+Happy navigating! Let's make BU a model for accessibility together! 🚶‍♂️🚶‍♀️👨‍🦽👩
 
 ## 🏆 Credits
-(A tip of the hat to all the brilliant minds who've contributed to AccessBU.)
+AccessBU wouldn't be what it is today without the brilliant minds and tireless efforts of our team. A huge shoutout and heartfelt thanks to:
 
-## 📜 License
-(Spell out the magical rights and responsibilities that come with using AccessBU.)
+- **Eric Chen**: For his visionary leadership and innovative approach in conceptualizing AccessBU.
+- **Jason Li**: The tech wizard behind the seamless integration of our mapping functionalities and user interface design.
+- **Andres Garcia**: For ensuring that every route is as accessible as it is accurate, and for his dedication to user experience.
+- **Jacob Chin**: The backbone of our community-driven features, whose efforts have made our app a platform for inclusivity.
 
-## 📬 Contact Us
-Got a spellbinding idea or just want to chat? Drop us an owl at [Your Contact Email]! 💌
+Each member has played a pivotal role in bringing this project to life. Their unique talents and unwavering dedication have created not just an app, but a movement towards a more accessible and inclusive Boston University.
+
+Here's to making every step on campus a step towards inclusivity!
 
 ---
 
