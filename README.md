@@ -1,4 +1,4 @@
-# 🌟 AccessBU
+# 🌟 AccessBU (INCLUSIVE INNOVATION TRACK)
 
 ## 🚀 Introduction
 Welcome to **AccessBU** – your innovative guide through Boston University's campus! 🏫🌐 This isn't just a navigation app; it's a movement towards a more inclusive and accessible world. 🌍🤝 Whether you're visually impaired, have mobility challenges, or just want to support an inclusive campus, AccessBU is here for you!
