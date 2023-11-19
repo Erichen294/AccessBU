@@ -32,6 +32,23 @@ function HomeScreen() {
         return;
       }
 
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const earthRadius = 6371; // Earth's radius in kilometers
+        const dLat = toRadians(lat2 - lat1);
+        const dLon = toRadians(lon2 - lon1);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = earthRadius * c; // Distance in kilometers
+        return distance * 1000; // Convert to meters
+      }
+      
+      function toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+      }
+
       locationSubscription = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.High,
@@ -40,6 +57,22 @@ function HomeScreen() {
         (newLocation) => {
           console.log('New location obtained:', newLocation);
           setLocation(newLocation);
+      
+          if (steps.length > 0 && currentStep < steps.length) {
+            const nextStep = steps[currentStep];
+            const distance = calculateDistance(
+              newLocation.coords.latitude,
+              newLocation.coords.longitude,
+              nextStep.end_location.lat,
+              nextStep.end_location.lng
+            );
+
+            // If the user is within 20 meters of the next step, display the instruction
+            if (distance < 20) {
+              setCurrentInstruction(nextStep.html_instructions);
+              setCurrentStep(currentStep + 1);
+            }
+          }
         },
       );
     })();
@@ -49,7 +82,7 @@ function HomeScreen() {
         locationSubscription.remove();
       }
     };
-  }, []);
+  }, [currentStep, steps]);
 
   const getDirections = async (destination) => {
     try {
