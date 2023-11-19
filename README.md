@@ -62,6 +62,9 @@ AccessBU wouldn't be what it is today without the brilliant minds and tireless e
 - **Andres Garcia**: For ensuring that every route is as accessible as it is accurate, and for his dedication to user experience.
 - **Jacob Chin**: The backbone of our community-driven features, whose efforts have made our app a platform for inclusivity.
 
+![IMG_5763](https://github.com/Erichen294/AccessBU/assets/108195485/d5e4d805-805f-44e9-9427-208f1fe14308)
+
+
 Each member has played a pivotal role in bringing this project to life. Their unique talents and unwavering dedication have created not just an app, but a movement towards a more accessible and inclusive Boston University.
 
 Here's to making every step on campus a step towards inclusivity!
