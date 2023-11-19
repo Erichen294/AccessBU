@@ -1,9 +1,24 @@
 const https = require('https');
+const cors = require('cors');
 const apiKey = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y';
 const testOrigin = '700 Commonwealth Ave, Boston, MA 02215'
 const testDestination = '915 Commonwealth Ave, Boston, MA 02215'
 let OriginCoord; // Variable to store the coordinates
 let DestinationCoord; // Variable to store the coordinates
+
+const express = require('express');
+const app = express();
+
+// Define an API endpoint for test communication
+app.get('/testCommunication', (req, res) => {
+    // Respond with a simple string
+    res.send('Hello from the backend!');
+});
+// Start the server
+app.listen(2000, () => {
+    console.log('Server is running on port 3000');
+});
+
 // Test Entrances
 const AccessibleEntrances = [
     { lat: 42.35171, lng: -71.117284 },

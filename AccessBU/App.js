@@ -13,7 +13,7 @@ import * as Tts from 'expo-speech';
 import * as Speech from 'expo-speech';
 
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
+const GOOGLE_MAPS_APIKEY = ''; // Replace with your Google Maps API key
 
 function removeHTMLTags(str) {
   return str.replace(/<[^>]*>?/gm, '');
@@ -187,6 +187,21 @@ function HomeScreen() {
     }
   };
 
+  const testComm = async () => {
+    try {
+      const response = await fetch('http://10.239.221.95:2000/testCommunication'); // fix this IP
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.text();
+      // Handle the data from the response
+      console.log(data);
+    } catch (error) {
+      // Handle any errors that occurred during the fetch
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
+
   const [currentInstruction, setCurrentInstruction] = useState('');
 
   const handleStartNavigation = () => {
@@ -226,6 +241,7 @@ function HomeScreen() {
           }}
         />
         <Button title="Get Directions" onPress={() => getDirections(destination)} />
+        <Button title="Test" onPress={() => testComm()} />
       </View>
       {location && (
         <MapView
