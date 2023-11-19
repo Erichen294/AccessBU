@@ -3,6 +3,8 @@
 ## 🚀 Introduction
 Welcome to **AccessBU** – your innovative guide through Boston University's campus! 🏫🌐 This isn't just a navigation app; it's a movement towards a more inclusive and accessible world. 🌍🤝 Whether you're visually impaired, have mobility challenges, or just want to support an inclusive campus, AccessBU is here for you!
 
+Video Submission: https://www.youtube.com/watch?v=t7wAMd_WsuE&ab_channel=JacobChin
+
 ## 🎉 Features
 - **👣 Accessible Routing**: Find your way to the most accessible entrance, not just the building. It's all about the journey and the destination!
 - **🔊 Audible Directions**: Listen up! Our app speaks to you, providing clear, audible instructions.
