@@ -18,6 +18,72 @@ const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace
 function removeHTMLTags(str) {
   return str.replace(/<[^>]*>?/gm, '');
 }
+function TicTacToeScreen() {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [xIsNext, setXIsNext] = useState(true);
+  const winner = calculateWinner(board);
+
+  function handleClick(i) {
+    const boardCopy = [...board];
+    if (winner || boardCopy[i]) return;
+    boardCopy[i] = xIsNext ? 'X' : 'O';
+    setBoard(boardCopy);
+    setXIsNext(!xIsNext);
+  }
+
+  function resetBoard() {
+    setBoard(Array(9).fill(null));
+    setXIsNext(true);
+  }
+
+  function renderSquare(i) {
+    return <Button title={board[i] ? board[i] : ' '} onPress={() => handleClick(i)} />;
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.row}>
+        {renderSquare(0)}
+        {renderSquare(1)}
+        {renderSquare(2)}
+      </View>
+      <View style={styles.row}>
+        {renderSquare(3)}
+        {renderSquare(4)}
+        {renderSquare(5)}
+      </View>
+      <View style={styles.row}>
+        {renderSquare(6)}
+        {renderSquare(7)}
+        {renderSquare(8)}
+      </View>
+      <Text>
+        {winner ? 'Winner: ' + winner : 'Next Player: ' + (xIsNext ? 'X' : 'O')}
+      </Text>
+      <Button title="Reset Board" onPress={resetBoard} />
+    </View>
+  );
+}
+
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
 
 function HomeScreen() {
   const [location, setLocation] = useState(null);
@@ -252,6 +318,7 @@ export default function App() {
 >
   <Tab.Screen name="Home" component={HomeScreen} />
   <Tab.Screen name="About" component={AboutScreen} />
+  <Tab.Screen name="Tic Tac Toe" component={TicTacToeScreen} />
 </Tab.Navigator>
     </NavigationContainer>
   );
@@ -302,5 +369,8 @@ const styles = StyleSheet.create({
   },
   instructionsText: {
     fontSize: 16,
+  },
+  row: {
+    flexDirection: 'row',
   },
 });
