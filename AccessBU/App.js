@@ -11,7 +11,8 @@ import polyline from '@mapbox/polyline';
 import RenderHTML from 'react-native-render-html';
 
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
+
+const GOOGLE_MAPS_APIKEY = 'chillout'; // Replace with your Google Maps API key
 
 function HomeScreen() {
   const [location, setLocation] = useState(null);
