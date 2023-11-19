@@ -1,6 +1,6 @@
 const https = require('https');
 const cors = require('cors');
-const apiKey = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y';
+const apiKey = ''; // Insert you APIkey here
 const testOrigin = '8 St Marys St, Boston, MA 02215'
 const testDestination = '915 Commonwealth Ave, Boston, MA 02215'
 let OriginCoord; // Variable to store the coordinates
