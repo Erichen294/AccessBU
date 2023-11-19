@@ -13,7 +13,7 @@ import * as Tts from 'expo-speech';
 import * as Speech from 'expo-speech';
 
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
+const GOOGLE_MAPS_APIKEY = ''; // Replace with your Google Maps API key
 let recvPayload = {};
 
 function removeHTMLTags(str) {
