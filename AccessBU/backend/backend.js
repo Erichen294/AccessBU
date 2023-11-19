@@ -8,7 +8,7 @@ let DestinationCoord; // Variable to store the coordinates
 
 const express = require('express');
 const app = express();
-const parsedData = {};
+let payload = {};
 
 // Add waypoints as latitude and longitude coordinates
 const stoplights = [
@@ -40,7 +40,7 @@ const adjacencyMatrix = [
 // Define an API endpoint for test communication
 app.get('/testCommunication', (req, res) => {
     // Respond with a simple string
-    res.send(parsedData.routes[0].overview_polyline.points);
+    res.send(payload);
 });
 
 // Start the server
@@ -229,7 +229,7 @@ function getDirections(originCoords, destinationCoords, apiKey) {
         // { lat: 42.35018941, lng: -71.10644469 }
     ];
     
-    const waypoints = "42.35135562, -71.11583394 | 42.35131338, -71.115641 | 42.35020661, -71.10664062 | 42.34985392, -71.10676672 | 42.34981235, -71.10647767"
+    const waypoints = "42.34985392, -71.10676672" //42.35020661, -71.10664062 | 42.35135562, -71.11583394  | 42.35131338, -71.115641 | 42.34981235, -71.10647767
 
     // const waypoints = [
     //     // '42.346676,-71.097218', // Example coordinates
@@ -247,7 +247,8 @@ function getDirections(originCoords, destinationCoords, apiKey) {
         });
 
         res.on('end', () => {
-            parsedData = JSON.parse(data);
+            const parsedData = JSON.parse(data);
+            payload = parsedData;
 
             if (parsedData.routes.length > 0 && parsedData.routes[0].legs.length > 0) {
                 const leg = parsedData.routes[0].legs[0];

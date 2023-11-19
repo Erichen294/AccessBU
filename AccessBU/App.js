@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet, Text, View, Button, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Button, Pressable, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { StatusBar } from 'expo-status-bar';
@@ -13,7 +13,8 @@ import * as Tts from 'expo-speech';
 import * as Speech from 'expo-speech';
 
 
-const GOOGLE_MAPS_APIKEY = ''; // Replace with your Google Maps API key
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y'; // Replace with your Google Maps API key
+let recvPayload = {};
 
 function removeHTMLTags(str) {
   return str.replace(/<[^>]*>?/gm, '');
@@ -57,10 +58,14 @@ function TicTacToeScreen() {
         {renderSquare(7)}
         {renderSquare(8)}
       </View>
-      <Text>
+      <Text style={{textAlign: 'center', fontSize: 16,}}>
         {winner ? 'Winner: ' + winner : 'Next Player: ' + (xIsNext ? 'X' : 'O')}
       </Text>
       <Button title="Reset Board" onPress={resetBoard} />
+      <Text style={{textAlign: 'center', fontSize: 16,}}>
+        {"\n"}Have you seen an accessible entrance{"\n"}or audible crosswalk beacon?{"\n"}
+      </Text>
+      <Button title="Record AccessPoint"/>
     </View>
   );
 }
@@ -87,6 +92,7 @@ function calculateWinner(squares) {
 
 function HomeScreen() {
   const [location, setLocation] = useState(null);
+  const [newStartPoint, setNewStartPoint] = useState(null);
   const [destination, setDestination] = useState(null);
   const [directions, setDirections] = useState(null);
   const [showStartNavigation, setShowStartNavigation] = useState(false);
@@ -157,15 +163,23 @@ function HomeScreen() {
     };
   }, [currentStep, steps]);
 
-  const getDirections = async (destination) => {
+  const getDirections = async (destination, newStartPoint) => {
     try {
       console.log(`Origin: ${location.coords.latitude},${location.coords.longitude}`);
       console.log(`Destination: ${destination}`);
+      console.log(`StartPoint: ${newStartPoint}`)
   
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${location.coords.latitude},${location.coords.longitude}&destination=${destination}&mode=walking&key=${GOOGLE_MAPS_APIKEY}`
-      );
-      const data = await response.json();
+      // const response = await fetch(
+      //   `https://maps.googleapis.com/maps/api/directions/json?origin=${location.coords.latitude},${location.coords.longitude}&destination=${destination}&mode=walking&key=${GOOGLE_MAPS_APIKEY}`
+      // );
+
+      // const response = await fetch(
+      //   `https://maps.googleapis.com/maps/api/directions/json?origin=${newStartPoint}&destination=${destination}&mode=walking&key=${GOOGLE_MAPS_APIKEY}`
+      // );
+      // const data = await response.json();
+      await testComm();
+
+      const data = recvPayload;
   
       if (!data.routes.length) {
         console.log('No routes found');
@@ -193,9 +207,10 @@ function HomeScreen() {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      const data = await response.text();
+      const data = await response.json();
       // Handle the data from the response
       console.log(data);
+      recvPayload = data;
     } catch (error) {
       // Handle any errors that occurred during the fetch
       console.error('There was a problem with the fetch operation:', error);
@@ -240,8 +255,21 @@ function HomeScreen() {
             language: 'en',
           }}
         />
-        <Button title="Get Directions" onPress={() => getDirections(destination)} />
-        <Button title="Test" onPress={() => testComm()} />
+        <GooglePlacesAutocomplete
+          placeholder='Starting Point'
+          onPress={(data, details = null) => {
+            if (details) {
+              console.log(details);
+              setNewStartPoint(details.description);
+            }
+          }}
+          query={{
+            key: GOOGLE_MAPS_APIKEY,
+            language: 'en',
+          }}
+        />
+        <Button title="Get Directions" onPress={() => getDirections(destination, newStartPoint)} />
+        {/* <Button title="Test" onPress={() => testComm()} /> */}
       </View>
       {location && (
         <MapView
@@ -250,8 +278,8 @@ function HomeScreen() {
           region={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: 0.0022,
+            longitudeDelta: 0.0021,
           }}
         >
           <Marker
@@ -260,7 +288,13 @@ function HomeScreen() {
               longitude: location.coords.longitude,
             }}
             title="My Location"
+            // pinColor='blue'
+          >
+          <Image
+            source={require('./assets/Subject.png')} // Replace with the correct path to your image
+            style={{ width: 45, height: 45 }} // Adjust width and height as needed
           />
+          </Marker>
           {directions && (
             <>
               <Polyline
@@ -321,6 +355,8 @@ export default function App() {
         iconName = focused ? 'home' : 'home-outline';
       } else if (route.name === 'About') {
         iconName = focused ? 'information-circle' : 'information-circle-outline';
+      } else if (route.name === 'Contribute') {
+        iconName = focused ? 'share' : 'share-outline';
       }
 
       // You can return any component that you like here!
@@ -334,7 +370,7 @@ export default function App() {
 >
   <Tab.Screen name="Home" component={HomeScreen} />
   <Tab.Screen name="About" component={AboutScreen} />
-  <Tab.Screen name="Tic Tac Toe" component={TicTacToeScreen} />
+  <Tab.Screen name="Contribute" component={TicTacToeScreen} />
 </Tab.Navigator>
     </NavigationContainer>
   );
