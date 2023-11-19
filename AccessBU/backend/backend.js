@@ -1,6 +1,6 @@
 const https = require('https');
-const apiKey = 'Insert Key';
-const testOrigin = '775 Commonwealth Ave, Boston, MA 02215'
+const apiKey = 'AIzaSyCxKzb1TTNef3e0wcQcnurbtLHSZendI3Y';
+const testOrigin = '700 Commonwealth Ave, Boston, MA 02215'
 const testDestination = '915 Commonwealth Ave, Boston, MA 02215'
 let OriginCoord; // Variable to store the coordinates
 let DestinationCoord; // Variable to store the coordinates
@@ -128,6 +128,19 @@ function getDirections(originCoords, destinationCoords, apiKey) {
     const destination = destinationCoords;
 
     // Add waypoints as latitude and longitude coordinates
+    // const stoplights = [
+    //     { lat: 42.35135562, lng: -71.11583394 },
+    //     { lat: 42.35094121, lng: -71.11591662 },
+    //     { lat: 42.35092989, lng: -71.11573458 },
+    //     { lat: 42.35131338, lng: -71.115641 },
+    //     { lat: 42.35020661, lng: -71.10664062 },
+    //     { lat: 42.34985392, lng: -71.10676672 },
+    //     { lat: 42.34981235, lng: -71.10647767 },
+    //     { lat: 42.35018941, lng: -71.10644469 }
+    // ];
+    
+    // const waypoints = stoplights.map(s => `${s.lat},${s.lng}`).join('|');
+
     const waypoints = [
         // '42.346676,-71.097218', // Example coordinates
         // '42.349046,-71.095313'  // More coordinates
